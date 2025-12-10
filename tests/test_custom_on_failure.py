@@ -1,11 +1,11 @@
-from ..typesentinel.decorator import type_check
+from ..typesentinel.decorator import type_check, TypeCheckContext
 from ..typesentinel.type_check import TypeCheck, TypeCheckResult
 
 def test_custom_handler_receives_failures():
     captured = {}
 
-    def handler(*fails: TypeCheckResult):
-        captured["msg"] = str(fails[0].type_check.name)
+    def handler(context:TypeCheckContext):
+        captured["msg"] = str(context.failed_results[0].type_check.name)
 
     @type_check(a=int, on_failure=handler)
     def fn(a):

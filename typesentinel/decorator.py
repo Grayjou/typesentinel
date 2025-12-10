@@ -9,13 +9,33 @@ from .type_check import (
 from functools import wraps
 from typing import Callable, Type, Any, Awaitable
 import inspect
+from dataclasses import dataclass
 
 
-def default_on_type_check_failure(*failures: TypeCheckResult) -> None:
-    if not failures:
+@dataclass
+class TypeCheckContext:
+    """Context for type checking that includes all relevant information."""
+    func: Callable
+    args: tuple
+    kwargs: dict
+    signature: inspect.Signature
+    bound_args: inspect.BoundArguments
+    all_results: list[TypeCheckResult]
+    failed_results: list[TypeCheckResult]
+    arg_names: list[str]
+    
+    @property
+    def passed_results(self) -> list[TypeCheckResult]:
+        """Get all passed type check results."""
+        return [r for r in self.all_results if r.passed]
+
+
+def default_on_type_check_failure(context: TypeCheckContext) -> None:
+    """Default behavior on type check failure: raise TypeError with details."""
+    if not context.failed_results:
         return
 
-    first = failures[0]
+    first = context.failed_results[0]
     tc = first.type_check
     value = first.value
 
@@ -150,21 +170,44 @@ class TypeCheckDecorator:
         failed = [r for r in failures if not r.passed]
         return failures, failed
     
-    def _handle_failures(self, failed: list[TypeCheckResult]) -> None:
-        """Call appropriate failure handler."""
-        if failed:
-            handler = self.on_failure or type_check_default_handler
-            handler(*failed)
+    def _create_context(
+        self,
+        func: Callable,
+        args: tuple,
+        kwargs: dict,
+        signature: inspect.Signature,
+        bound_args: inspect.BoundArguments,
+        all_results: list[TypeCheckResult],
+        failed_results: list[TypeCheckResult],
+        arg_names: list[str]
+    ) -> TypeCheckContext:
+        """Create a TypeCheckContext with all relevant information."""
+        return TypeCheckContext(
+            func=func,
+            args=args,
+            kwargs=kwargs,
+            signature=signature,
+            bound_args=bound_args,
+            all_results=all_results,
+            failed_results=failed_results,
+            arg_names=arg_names
+        )
     
-    async def _handle_failures_async(self, failed: list[TypeCheckResult]) -> None:
+    def _handle_failures(self, context: TypeCheckContext) -> None:
+        """Call appropriate failure handler."""
+        if context.failed_results:
+            handler = self.on_failure or type_check_default_handler
+            handler(context)
+    
+    async def _handle_failures_async(self, context: TypeCheckContext) -> None:
         """Call appropriate failure handler for async context."""
-        if failed:
+        if context.failed_results:
             handler = self.on_failure or type_check_default_handler
             
             if inspect.iscoroutinefunction(handler):
-                await handler(*failed)
+                await handler(context)
             else:
-                handler(*failed)
+                handler(context)
     
     def _create_wrapper(self, func: Callable) -> Callable:
         """Create appropriate wrapper based on function type."""
@@ -185,9 +228,21 @@ class TypeCheckDecorator:
             bound.apply_defaults()
             
             arg_names = list(bound.arguments.keys())
-            _, failed = self._validate_arguments(bound.arguments, arg_names)
+            all_results, failed_results = self._validate_arguments(bound.arguments, arg_names)
             
-            self._handle_failures(failed)
+            if failed_results:
+                context = self._create_context(
+                    func=func,
+                    args=args,
+                    kwargs=kwargs,
+                    signature=signature,
+                    bound_args=bound,
+                    all_results=all_results,
+                    failed_results=failed_results,
+                    arg_names=arg_names
+                )
+                self._handle_failures(context)
+            
             return func(*args, **kwargs)
         
         return wrapper
@@ -205,9 +260,20 @@ class TypeCheckDecorator:
             bound.apply_defaults()
             
             arg_names = list(bound.arguments.keys())
-            _, failed = self._validate_arguments(bound.arguments, arg_names)
+            all_results, failed_results = self._validate_arguments(bound.arguments, arg_names)
             
-            await self._handle_failures_async(failed)
+            if failed_results:
+                context = self._create_context(
+                    func=func,
+                    args=args,
+                    kwargs=kwargs,
+                    signature=signature,
+                    bound_args=bound,
+                    all_results=all_results,
+                    failed_results=failed_results,
+                    arg_names=arg_names
+                )
+                await self._handle_failures_async(context)
             
             if is_func_async:
                 return await func(*args, **kwargs)
