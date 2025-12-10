@@ -1,6 +1,8 @@
 
 # pytype-check
-
+<p align="center">
+  <img src="logo.png" alt="pytype_check" width="160" />
+</p>
 
 **pytype-check** is a lightweight, dependency-free library for **runtime type checking**
 of Python function arguments. It supports both synchronous and asynchronous functions,

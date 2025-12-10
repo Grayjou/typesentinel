@@ -1,0 +1,11 @@
+<svg width="240" height="240" viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg">
+  <rect width="240" height="240" rx="28" fill="#101820"/>
+
+  <!-- Minimal matrix -->
+  <rect x="34" y="40" width="60" height="60" rx="12" fill="#2EC973"/>
+  <rect x="146" y="40" width="60" height="60" rx="12" fill="#2EC973"/>
+  <rect x="34" y="140" width="60" height="60" rx="12" fill="#2EC973"/>
+
+  <!-- Clean check -->
+  <path d="M150 165l24 28l34-44" stroke="#2EC973" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
