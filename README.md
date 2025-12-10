@@ -1,70 +1,113 @@
-# pytype_check
+````markdown
+# pytype-check
 
-`pytype_check` provides small, dependency-free helpers for runtime validation of function
-arguments. Decorate any synchronous or asynchronous function to validate positional or
-keyword arguments using type hints, explicit `TypeCheck` objects, or keyword shorthand.
+[![PyPI](https://img.shields.io/pypi/v/pytype-check.svg)](https://pypi.org/project/pytype-check/)
+![Python Versions](https://img.shields.io/pypi/pyversions/pytype-check.svg)
+![License](https://img.shields.io/pypi/l/pytype-check.svg)
+![Tests](https://github.com/grayjou/pytype-check/workflows/tests/badge.svg)
 
-## Installation
+**pytype-check** is a lightweight, dependency-free library for **runtime type checking**
+of Python function arguments. It supports both synchronous and asynchronous functions,
+Union types, custom failure handlers, and signature-aware error messages.
 
 ```bash
 pip install pytype-check
-```
+````
 
-## Quick start
+---
 
-Use the `type_check` decorator to enforce annotations automatically or pass explicit
-types as keyword arguments:
+## 🧠 Why `pytype-check`?
+
+Other libraries like Pydantic, Beartype, Enforce, or typeguard offer runtime validation,
+but often come with heavy dependencies, global monkey-patching, performance costs, or
+complicated configuration.
+
+`pytype-check` focuses on **one thing** and does it well:
+
+* ✔ **Minimal** — zero dependencies, tiny footprint
+* ✔ **Explicit** — works only where you decorate; never global
+* ✔ **Async-friendly** — supports async functions & async failure handlers
+* ✔ **Precise errors** — error messages include the real parameter names
+* ✔ **Flexible** — annotations, shorthand, or explicit `TypeCheck` objects
+* ✔ **Safe** — never mutates your function’s signature or typing info
+
+If you want simple, predictable runtime validation with no overhead,
+**pytype-check is built for you.**
+
+---
+
+## 🚀 Quick Start
+
+### Type checking from function annotations
 
 ```python
 from pytype_check.decorator import type_check
 
-@type_check  # pulls types from annotations
-def greet(name: str, excited: bool = False) -> str:
+@type_check
+def greet(name: str, excited: bool = False):
     return f"Hello, {name}{'!' if excited else ''}"
 
-@type_check(name=str, times=int)  # shorthand keyword type checks
-async def repeat(name: str, times: int):
+greet("Alice")       # OK
+greet(123)           # ❌ Invalid type for argument 'name': expected str, got int
+```
+
+### Shorthand keyword type checks
+
+```python
+@type_check(name=str, times=int)
+async def repeat(name, times):
     return ", ".join(name for _ in range(times))
 ```
 
-Passing values that fail validation raises a `TypeError` with a clear message such as
-`Invalid type for argument 'name': expected str, got int`.
+---
 
-## Customizing failure handling
+## 🔍 Union Type Support
 
-Provide an `on_failure` callback to intercept failed checks. The handler receives one or
-more `TypeCheckResult` instances and can raise, log, or transform the error:
+```python
+from typing import Union
+
+@type_check(a=Union[int, str])
+def fn(a):
+    return a
+
+@type_check(a=int | str)
+def fn(a):
+    return a
+```
+
+Error message:
+
+```
+Invalid type for argument 'a': expected int | str, got float
+```
+
+---
+
+## 🛠 Custom Failure Handling
 
 ```python
 from pytype_check.decorator import type_check
 from pytype_check.type_check import TypeCheckResult
 
-failures = []
-
-async def capture(*results: TypeCheckResult):
-    failures.extend(results)
-    # raise a custom error instead of the default TypeError
+async def capture(*fails: TypeCheckResult):
     raise ValueError("validation failed")
 
 @type_check(a=int, on_failure=capture)
-async def double(a: int) -> int:
+async def double(a):
     return a * 2
 ```
 
-Both synchronous and asynchronous handlers are supported. If you omit `on_failure`, a
-`TypeError` is raised using the message configured on each `TypeCheck`.
+---
 
-## Using explicit `TypeCheck` objects
-
-You can define checks manually for more control over argument kinds and error text:
+## 🧩 Explicit TypeCheck Objects
 
 ```python
 from pytype_check.decorator import type_check
 from pytype_check.type_check import TypeCheck, ArgKind
 
 checks = [
-    TypeCheck(0, int, arg_kind=ArgKind.POSITIONAL),
-    TypeCheck("label", str, arg_kind=ArgKind.KEYWORD, message="label must be a string"),
+    TypeCheck(0, int, ArgKind.POSITIONAL),
+    TypeCheck("label", str, ArgKind.KEYWORD, message="label must be a string"),
 ]
 
 @type_check(checks)
@@ -72,12 +115,20 @@ def render(value, *, label):
     return f"{label}: {value}"
 ```
 
-## Development
+---
 
-After cloning the repository you can run the test suite with:
+## 🧪 Testing
 
 ```bash
 python -m pytest
 ```
 
-The project is distributed under the MIT License.
+---
+
+## 📄 License
+
+MIT License. See `LICENSE` for details.
+
+```
+
+---
