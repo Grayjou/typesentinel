@@ -1,7 +1,7 @@
 
 # typesentinel
 <p align="center">
-  <img src="https://raw.githubusercontent.com/Grayjou/typesentinel/refs/heads/main/logo.png" alt="pytype_check" width="160" />
+  <img src="https://raw.githubusercontent.com/Grayjou/typesentinel/refs/heads/main/logo.png" alt="typesentinel" width="160" />
 </p>
 
 **typesentinel** is a lightweight, dependency-free library for **runtime type checking**
@@ -39,7 +39,7 @@ If you want simple, predictable runtime validation with no overhead,
 ### Type checking from function annotations
 
 ```python
-from pytype_check.decorator import type_check
+from typesentinel.decorator import type_check
 
 @type_check
 def greet(name: str, excited: bool = False):
@@ -84,8 +84,8 @@ Invalid type for argument 'a': expected int | str, got float
 ## 🛠 Custom Failure Handling
 
 ```python
-from pytype_check.decorator import type_check
-from pytype_check.type_check import TypeCheckResult
+from typesentinel.decorator import type_check
+from typesentinel.type_check import TypeCheckResult
 
 async def capture(*fails: TypeCheckResult):
     raise ValueError("validation failed")
@@ -100,8 +100,8 @@ async def double(a):
 ## 🧩 Explicit TypeCheck Objects
 
 ```python
-from pytype_check.decorator import type_check
-from pytype_check.type_check import TypeCheck, ArgKind
+from typesentinel.decorator import type_check
+from typesentinel.type_check import TypeCheck, ArgKind
 
 checks = [
     TypeCheck(0, int, ArgKind.POSITIONAL),
