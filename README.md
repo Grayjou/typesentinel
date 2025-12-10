@@ -1,10 +1,6 @@
 ````markdown
 # pytype-check
 
-[![PyPI](https://img.shields.io/pypi/v/pytype-check.svg)](https://pypi.org/project/pytype-check/)
-![Python Versions](https://img.shields.io/pypi/pyversions/pytype-check.svg)
-![License](https://img.shields.io/pypi/l/pytype-check.svg)
-![Tests](https://github.com/grayjou/pytype-check/workflows/tests/badge.svg)
 
 **pytype-check** is a lightweight, dependency-free library for **runtime type checking**
 of Python function arguments. It supports both synchronous and asynchronous functions,
