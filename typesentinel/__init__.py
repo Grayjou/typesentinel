@@ -23,4 +23,4 @@ __all__ = [
     "type_check_default_handler",
 ]
 
-__version__ = "0.2.1"
+__version__ = "0.2.3"

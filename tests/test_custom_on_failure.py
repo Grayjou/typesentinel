@@ -65,3 +65,18 @@ def test_custom_handler_gets_full_context():
     assert all(isinstance(r, TypeCheckResult) for r in captured["failed"])
     assert captured["args"] == ("bad", 123)
     assert captured["kwargs"] == {}
+
+def test_custom_handler_prevents_execution():
+    anger_level = {"level": 0}
+
+    def handler(context:TypeCheckContext):
+        anger_level["level"] += 1
+
+    @type_check(a=int, on_failure=handler)
+    def fn(a):
+        return a
+
+    result = fn("bad")
+
+    assert anger_level["level"] == 1
+    assert result is None
