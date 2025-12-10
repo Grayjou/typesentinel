@@ -20,7 +20,7 @@ def default_on_type_check_failure(*failures: TypeCheckResult) -> None:
     value = first.value
 
     # Use TypeCheck.message format
-    base = tc.message or f"Invalid type for key '{tc.name}': expected {tc.expected_type.__name__}"
+    base = tc.message
     raise TypeError(f"{base}, got {type(value).__name__}")
 
 
