@@ -1,6 +1,6 @@
 import pytest
 import asyncio
-from type_check.type_checking.decorator import type_check, TypeCheck, ArgKind
+from ..pytype_check.decorator import type_check, TypeCheck, ArgKind
 
 def test_missing_keyword_argument_raises_type_error():
     @type_check(a=int)

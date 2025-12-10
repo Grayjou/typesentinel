@@ -1,0 +1,39 @@
+[build-system]
+requires = ["hatchling>=1.25"]
+build-backend = "hatchling.build"
+
+[project]
+name = "pytype-check"
+version = "0.1.0"
+description = "Runtime type checking decorators with sync and async support."
+readme = "README.md"
+authors = [
+    { name = "GrayJou" }
+]
+license = { file = "LICENSE" }
+requires-python = ">=3.10"
+keywords = ["typing", "runtime", "type-checking", "decorators"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development",
+    "Topic :: Software Development :: Libraries",
+    "Typing :: Typed"
+]
+
+[project.urls]
+Homepage = "https://github.com/grayjou/pytype_check"
+Repository = "https://github.com/grayjou/pytype_check"
+
+[tool.hatch.build.targets.wheel]
+packages = ["pytype_check"]
+
+[tool.hatch.build.targets.sdist]
+include = ["pytype_check", "README.md", "LICENSE", "tests"]

@@ -1,20 +1,21 @@
-import pytest
 import asyncio
-from type_check.type_checking.decorator import type_check
+import pytest
 
-@pytest.mark.asyncio
-async def test_async_function_type_checking():
+from ..pytype_check.decorator import type_check
+
+
+def test_async_function_type_checking():
     @type_check(a=int)
     async def fn(a):
         return a * 2
 
-    assert await fn(5) == 10
+    assert asyncio.run(fn(5)) == 10
 
     with pytest.raises(TypeError):
-        await fn("oops")
+        asyncio.run(fn("oops"))
 
-@pytest.mark.asyncio
-async def test_async_failure_handler():
+
+def test_async_failure_handler():
     async def handler(*fails):
         raise TypeError("async fail")
 
@@ -23,6 +24,6 @@ async def test_async_failure_handler():
         return a
 
     with pytest.raises(TypeError) as exc:
-        await fn("oops")
+        asyncio.run(fn("oops"))
 
     assert str(exc.value) == "async fail"
