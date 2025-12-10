@@ -1,5 +1,5 @@
 import pytest
-from ..type_checking.type_check import TypeCheck, DefaultTypeCheckKwarg, ArgKind
+from ..pytype_check.type_check import TypeCheck, DefaultTypeCheckKwarg, ArgKind
 
 def test_custom_message_used():
     tc = TypeCheck("age", int, ArgKind.KEYWORD, message="Age must be integer")

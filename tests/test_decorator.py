@@ -1,4 +1,4 @@
-from ..type_checking.decorator import TypeCheckDecorator, type_check, _apply_annotation_type_checks
+from ..pytype_check.decorator import TypeCheckDecorator, type_check, _apply_annotation_type_checks
 
 def test_type_check_decorator():
     @type_check # type: ignore

@@ -1,5 +1,5 @@
-from ..type_checking.decorator import type_check
-from ..type_checking.type_check import TypeCheck, TypeCheckResult
+from ..pytype_check.decorator import type_check
+from ..pytype_check.type_check import TypeCheck, TypeCheckResult
 
 def test_custom_handler_receives_failures():
     captured = {}

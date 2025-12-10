@@ -25,5 +25,6 @@ def pytest_sessionfinish(session, exitstatus):
                 failures.append(f"{rep.nodeid}\n{rep.longrepr}\n\n")
     
     if failures:
-        with open("type_check/pytest_reports.txt", "w", encoding="utf-8") as f:
+        report_path = "pytype_check/pytest_reports.txt"
+        with open(report_path, "w", encoding="utf-8") as f:
             f.writelines(failures)
