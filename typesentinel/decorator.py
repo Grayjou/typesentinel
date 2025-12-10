@@ -242,7 +242,7 @@ class TypeCheckDecorator:
                     arg_names=arg_names
                 )
                 self._handle_failures(context)
-            
+                return
             return func(*args, **kwargs)
         
         return wrapper
@@ -274,7 +274,7 @@ class TypeCheckDecorator:
                     arg_names=arg_names
                 )
                 await self._handle_failures_async(context)
-            
+                return
             if is_func_async:
                 return await func(*args, **kwargs)
             else:
