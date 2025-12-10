@@ -124,6 +124,15 @@ class TypeCheck:
         return f"{self.message}, got {actual_type.__name__}"
 
 
+    def copy_with(self, **changes) -> "TypeCheck":
+        return TypeCheck(
+            key=changes.get("key", self.key),
+            expected_type=changes.get("expected_type", self.expected_type),
+            arg_kind=changes.get("arg_kind", self.arg_kind),
+            message=changes.get("message", self.message),
+            name=changes.get("name", self.name),
+        )
+
 class DefaultTypeCheckKwarg(TypeCheck):
     """
     TypeCheck that *skips validation if the keyword argument is missing*.

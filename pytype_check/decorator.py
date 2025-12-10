@@ -24,7 +24,6 @@ def default_on_type_check_failure(*failures: TypeCheckResult) -> None:
     raise TypeError(f"{base}, got {type(value).__name__}")
 
 
-
 # Allow global override
 type_check_default_handler = default_on_type_check_failure
 
@@ -77,6 +76,25 @@ class TypeCheckDecorator:
             self._signature_cache[func] = inspect.signature(func)
         return self._signature_cache[func]
     
+    def _rename_check_if_needed(self, tc: TypeCheck, arg_names: list[str]) -> TypeCheck:
+        """
+        Rename TypeCheck to use parameter name if it doesn't have a custom name.
+        Only called right before validation when we know argument names.
+        """
+        # If TypeCheck already has a custom name, keep it
+        if tc.name is not None and tc.name != str(tc.key):
+            return tc
+        
+        if tc.arg_kind == ArgKind.POSITIONAL and isinstance(tc.key, int):
+            if 0 <= tc.key < len(arg_names):
+                param_name = arg_names[tc.key]
+                return tc.copy_with(name=param_name)
+        
+        if tc.arg_kind == ArgKind.KEYWORD:
+            return tc.copy_with(name=str(tc.key))
+        
+        return tc
+    
     def _resolve_argument_value(
         self,
         tc: TypeCheck,
@@ -86,7 +104,7 @@ class TypeCheckDecorator:
         """Resolve argument value based on type check kind."""
         if tc.arg_kind == ArgKind.POSITIONAL:
             try:
-                param_name = arg_names[int(tc.key)]  # type: ignore[arg-type]
+                param_name = arg_names[int(tc.key)]
             except IndexError:
                 raise IndexError(
                     f"TypeCheck refers to positional index {tc.key}, "
@@ -114,6 +132,9 @@ class TypeCheckDecorator:
         failures: list[TypeCheckResult] = []
         
         for tc in self.normalized_checks:
+            # Rename check right before validation (minimal, localized change)
+            renamed_tc = self._rename_check_if_needed(tc, arg_names)
+            
             if tc.arg_kind == ArgKind.KEYWORD and isinstance(tc, DefaultTypeCheckKwarg):
                 # Skip validation if keyword is missing (has default)
                 if tc.key not in bound_arguments:
@@ -121,10 +142,10 @@ class TypeCheckDecorator:
             
             try:
                 value = self._resolve_argument_value(tc, bound_arguments, arg_names)
-                tc.validate(value)
-                failures.append(TypeCheckResult(tc, value, True))
+                renamed_tc.validate(value)
+                failures.append(TypeCheckResult(renamed_tc, value, True))
             except Exception:
-                failures.append(TypeCheckResult(tc, value, False))
+                failures.append(TypeCheckResult(renamed_tc, value, False))
         
         failed = [r for r in failures if not r.passed]
         return failures, failed
@@ -220,9 +241,8 @@ def type_check(
         return _apply_annotation_type_checks(func)
     
     # CASE B — used with params
-    # Type checker now knows type_checks is not callable here
     decorator = TypeCheckDecorator(
-        type_checks=type_checks,  # type: ignore[arg-type]
+        type_checks=type_checks,
         kw_shorthand=kw_expected_types,
         on_failure=on_failure,
     )
@@ -248,14 +268,14 @@ def _apply_annotation_type_checks(func: Callable) -> Callable:
         # Keyword-only or named parameters
         if param.kind in (param.KEYWORD_ONLY, param.POSITIONAL_OR_KEYWORD):
             if param.default is inspect._empty:
-                checks.append(TypeCheck(param_name, expected, arg_kind=ArgKind.KEYWORD))
+                checks.append(TypeCheck(param_name, expected, arg_kind=ArgKind.KEYWORD, name=param_name))
             else:
                 # Has default → behave like DefaultTypeCheckKwarg
                 checks.append(DefaultTypeCheckKwarg.from_pair(param_name, expected))
         
         # Positional-only parameters
         elif param.kind == param.POSITIONAL_ONLY:
-            checks.append(TypeCheck(idx, expected, arg_kind=ArgKind.POSITIONAL))
+            checks.append(TypeCheck(idx, expected, arg_kind=ArgKind.POSITIONAL, name=param_name))
     
     # Create decorator with annotation-derived checks
     decorator = TypeCheckDecorator(type_checks=checks, kw_shorthand={})
