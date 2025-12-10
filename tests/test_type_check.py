@@ -1,4 +1,4 @@
-from ..pytype_check.type_check import TypeCheck, ArgKind, valid_arg_kind_map
+from ..typesentinel.type_check import TypeCheck, ArgKind, valid_arg_kind_map
 from typing import Callable, Union
 import pytest
 

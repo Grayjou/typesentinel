@@ -1,7 +1,7 @@
 import asyncio
 import pytest
 
-from ..pytype_check.decorator import type_check
+from ..typesentinel.decorator import type_check
 
 
 def test_async_function_type_checking():
