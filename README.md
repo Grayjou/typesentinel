@@ -1,26 +1,26 @@
 
-# pytype-check
+# typesentinel
 <p align="center">
   <img src="logo.png" alt="pytype_check" width="160" />
 </p>
 
-**pytype-check** is a lightweight, dependency-free library for **runtime type checking**
+**typesentinel** is a lightweight, dependency-free library for **runtime type checking**
 of Python function arguments. It supports both synchronous and asynchronous functions,
 Union types, custom failure handlers, and signature-aware error messages.
 
 ```bash
-pip install pytype-check
+pip install typesentinel
 ````
 
 ---
 
-## 🧠 Why `pytype-check`?
+## 🧠 Why `typesentinel`?
 
 Other libraries like Pydantic, Beartype, Enforce, or typeguard offer runtime validation,
 but often come with heavy dependencies, global monkey-patching, performance costs, or
 complicated configuration.
 
-`pytype-check` focuses on **one thing** and does it well:
+`typesentinel` focuses on **one thing** and does it well:
 
 * ✔ **Minimal** — zero dependencies, tiny footprint
 * ✔ **Explicit** — works only where you decorate; never global
@@ -30,7 +30,7 @@ complicated configuration.
 * ✔ **Safe** — never mutates your function’s signature or typing info
 
 If you want simple, predictable runtime validation with no overhead,
-**pytype-check is built for you.**
+**typesentinel is built for you.**
 
 ---
 

@@ -3,7 +3,7 @@ requires = ["hatchling>=1.25"]
 build-backend = "hatchling.build"
 
 [project]
-name = "pytype-check"
+name = "typesentinel"
 version = "0.2.0"
 description = "Runtime type checking decorators with sync and async support."
 readme = "README.md"
