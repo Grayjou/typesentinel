@@ -47,15 +47,12 @@ class TypeCheck:
             object.__setattr__(
                 self,
                 "message",
-                f"Invalid type for key '{self.name}': expected {self.expected_type.__name__}",
+                f"Invalid type for argument '{self.name}': expected {self.expected_type.__name__}",
             )
 
     def validate(self, value):
         if not isinstance(value, self.expected_type):
-            raise TypeError(
-                f"argument '{self.name}' must be {self.expected_type.__name__}, "
-                f"got {type(value).__name__}"
-            )
+            raise TypeError(self.error_message(type(value)))
         return value
 
     @classmethod
@@ -76,6 +73,9 @@ class TypeCheck:
             message=data.get("message"),
             name=data.get("name"),
         )
+    
+    def error_message(self, actual_type: Type) -> str:
+        return f"{self.message}, got {actual_type.__name__}"
 
 
 class DefaultTypeCheckKwarg(TypeCheck):

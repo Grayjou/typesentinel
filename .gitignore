@@ -2,7 +2,7 @@
 __pycache__/
 *.py[codz]
 *$py.class
-
+pytest_reports.txt
 # C extensions
 *.so
 

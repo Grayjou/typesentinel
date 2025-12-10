@@ -12,19 +12,17 @@ import inspect
 
 
 def default_on_type_check_failure(*failures: TypeCheckResult) -> None:
-    """
-    Default behavior on type check failure: raise TypeError with details.
-    """
-    messages = []
-    for result in failures:
-        tc = result.type_check
-        messages.append(
-            f"{tc.arg_kind.value} argument '{tc.name or tc.key}' "
-            f"expected type {tc.expected_type.__name__}, "
-            f"got {type(result.value).__name__}"
-        )
-    full_message = "Type check failed:\n" + "\n".join(messages)
-    raise TypeError(full_message)
+    if not failures:
+        return
+
+    first = failures[0]
+    tc = first.type_check
+    value = first.value
+
+    # Use TypeCheck.message format
+    base = tc.message or f"Invalid type for key '{tc.name}': expected {tc.expected_type.__name__}"
+    raise TypeError(f"{base}, got {type(value).__name__}")
+
 
 
 # Allow global override
