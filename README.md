@@ -1,7 +1,7 @@
 
 # typesentinel
 <p align="center">
-  <img src="logo.png" alt="pytype_check" width="160" />
+  <img src="https://raw.githubusercontent.com/Grayjou/typesentinel/refs/heads/main/logo.png" alt="pytype_check" width="160" />
 </p>
 
 **typesentinel** is a lightweight, dependency-free library for **runtime type checking**
